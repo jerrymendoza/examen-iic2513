@@ -1,13 +1,22 @@
 import React from 'react';
 import './App.css';
-import Celda from './components/Celda';
 import Tablero from './containers/Tablero';
-function App() {
-  return (
-    <div className="App">
-      <Tablero/>
-    </div>
-  );
+
+import PropTypes from 'prop-types';
+
+class App extends React.Component {
+  render() {
+    return (
+      <div className="App">
+        <h1>{this.props.message}</h1>
+        <Tablero/>
+      </div>
+    );
+  }
 }
+
+App.propTypes = {
+  message: PropTypes.string.isRequired,
+};
 
 export default App;
