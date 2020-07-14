@@ -1,13 +1,14 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import Celda from '../components/Celda';
-import getTablero from '../game'; 
+
 
 class Tablero extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             over: false,
-            tablero: getTablero(),
+            tablero: props.tablero
         };
     }
 
@@ -21,14 +22,21 @@ class Tablero extends React.Component {
         console.log(`Salio! al tablero`)
         this.setState({
             over: false
+
         })
     };
 
-
     render()
         {
-        const {tablero} = this.state;  
-        const mapa = tablero.map((position) => <Celda key={`${position.x}${position.y}`} x={position.x} y={position.y}/>);
+
+        const { tablero } = this.props;  
+ 
+        const mapa = Object.keys(tablero.elements).map((key, index) => <Celda 
+                                                    key={key}
+                                                    cell={tablero.elements[key]} 
+                                                    />);
+
+        
         return (
             <div id="tablero" 
             className={`tablero${this.state.over ? " over" : ""}`}
@@ -39,4 +47,11 @@ class Tablero extends React.Component {
         )
         }
 }
+
+const mapStateToProps = (state) => {
+    return {
+        tablero: state.tablero
+    };
+};
+
 export default Tablero;

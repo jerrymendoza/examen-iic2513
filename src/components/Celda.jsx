@@ -1,23 +1,23 @@
 import React from 'react';
 
+
 class Celda extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            x : props.x,
-            y : props.y,
+            cell: props.cell,
             over: false
         };
     }
 
     handleMouseEnter = () => {
-        console.log(`Entro! (${this.state.x},${this.state.y})`)
+        const { cell } = this.state;
+        cell.myId()
         this.setState({
             over: true
         })
     };
     handleMouseLeave = () => {
-        console.log(`Salio! (${this.state.x},${this.state.y})`)
         this.setState({
             over: false
         })
@@ -34,4 +34,6 @@ class Celda extends React.Component {
             )
         }
 }
+
+
 export default Celda;

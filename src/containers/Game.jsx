@@ -4,6 +4,7 @@ import App from '../App';
 
 const mapStateToProps = state => ({
   message: state.message,
+  battle: state.battle
 });
 
 const Game = connect(
