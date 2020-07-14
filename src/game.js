@@ -14,18 +14,18 @@ function build() {
 export default class Battle {
     constructor(){
         this.tablero = new Tablero()
-        this.naves = {'P1': new Nave('P1', 'Portaviones')}
+        this.naves = {'P1': new Nave('P1', 'portaviones')}
 
         for (let i = 1; i < 5; i++){
-            this.naves[`F${i}`] = new Nave(`F${i}`, 'Fragata')
+            this.naves[`F${i}`] = new Nave(`F${i}`, 'fragata')
         }
 
         for (let i = 1; i < 4; i++){
-            this.naves[`C${i}`] = new Nave(`C${i}`, 'Crucero')
+            this.naves[`C${i}`] = new Nave(`C${i}`, 'crucero')
         }
 
         for (let i = 1; i < 3; i++){
-            this.naves[`D${i}`] = new Nave(`D${i}`, 'Destructor')
+            this.naves[`D${i}`] = new Nave(`D${i}`, 'destructor')
         }
     }
 
@@ -37,25 +37,26 @@ class Tablero {
     }   
 
     getCruz(position){
+        const availables = []
         const right = columns.slice(columns.findIndex(p => p === position.x)+1)
         const left = columns.slice(0, columns.findIndex(p => p === position.x))
         const top = [];
-        for (var i = 1; i <= position.y-1; i++) {
-            top.push(i);
+        for (var t = 1; t <= position.y-1; t++) {
+            top.push(t);
         }
+        const down = [];
+        for (var d = position.y+1; d <= 10; d++) {
+            down.push(d);
+        }
+        right.concat(left).map(x => {
+            availables.push({x: x, y: position.y})
+        })
 
-        console.log('######## RIGHT #############')
-        console.log(right)
-        console.log('#####################')
+        top.concat(down).map(y => {
+            availables.push({x: position.x, y: y})
+        })
 
-        console.log('######## LEFT #############')
-        console.log(left)
-        console.log('#####################')
-
-        console.log('######## TOP #############')
-        console.log(top)
-        console.log('#####################')
-
+        return availables
     }
 }
 

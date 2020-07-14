@@ -26,7 +26,7 @@ class Celda extends React.Component {
     render()
         {
             return (
-                <div id="celda" 
+                <div
                 className={`celda${this.state.over ? " over" : ""}`}
                 onMouseEnter={this.handleMouseEnter} 
                 onMouseLeave={this.handleMouseLeave}>
