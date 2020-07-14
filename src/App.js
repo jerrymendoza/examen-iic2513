@@ -4,7 +4,7 @@ import Tablero from './containers/Tablero';
 import Nave from './components/Nave';
 import Battle from './game'; 
 
-class App extends React.Component {
+class GameApp extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -46,18 +46,27 @@ class App extends React.Component {
                                                 />);
 
     return (
-      <div className="App">
+      <div id="game">
+        <div id="info">
         <h1>IIC2513 - EXAMEN </h1>
         <p>{this.state.shipSelected ? this.state.shipSelected.id : 'No Selected'} </p>
+        </div>
+        <div id="center">
         <Tablero 
           tablero={battle.tablero}
           handleCellClick={this.handleCellClick}
           handlePositionMouse={this.handlePositionMouse}
         />
-        {naves}
+        <div id="sidebar">
+          <div id="naves">{naves}</div>
+          
+        </div>
+        
+        
+        </div>
       </div>
     );
   }
 }
 
-export default App;
+export default GameApp;

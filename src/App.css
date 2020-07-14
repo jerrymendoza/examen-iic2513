@@ -1,21 +1,50 @@
+#game {
+  display: grid;
+  justify-items: center;
+}
+
+#center {
+  display: grid;
+  grid-template-columns: auto 1fr;
+}
+
+
 #tablero {
-  width: 520px;
-  height: 520px;
-  border: 1px solid chartreuse;
+  display: grid;
+  grid-template: ". x "
+                 "y mapa ";
+}
+#tablero .mapa {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
   grid-template-rows: repeat(10, 1fr);
   grid-auto-flow: column;
+  grid-area: mapa;
+  gap:2px;
 }
 
-.tablero.over {
-  background-color: chartreuse;
+.axis {
+  display: grid;
+  justify-items: center;
+  align-items: center;
 }
+.x-axis {
+  grid-area: x;
+  grid-auto-flow: column;
+  margin-bottom: 10px;
+}
+
+.y-axis {
+  grid-area: y;
+  grid-auto-flow: row;
+  margin-right:10px
+}
+
 
 .celda {
   width: 50px;
   height: 50px;
-  border: 1px solid black;
+  background-color: skyblue;
 }
 
 .celda.over {
