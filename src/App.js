@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
 import Tablero from './containers/Tablero';
+import Nave from './components/Nave';
 
 
 class App extends React.Component {
@@ -12,6 +13,7 @@ class App extends React.Component {
       <div className="App">
         <h1>{this.props.message}</h1>
         <Tablero tablero={battle.tablero}/>
+        <Nave /> 
       </div>
     );
   }

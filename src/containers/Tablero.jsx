@@ -8,7 +8,6 @@ class Tablero extends React.Component {
         super(props);
         this.state = {
             over: false,
-            tablero: props.tablero
         };
     }
 
@@ -35,7 +34,6 @@ class Tablero extends React.Component {
                                                     key={key}
                                                     cell={tablero.elements[key]} 
                                                     />);
-
         
         return (
             <div id="tablero" 
