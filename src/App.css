@@ -30,19 +30,19 @@
 }
 
 .portaviones {
-  border: 3px solid gray;
   background-color: gray;
 }
 
 .fragata {
-  border: 3px solid gold;
   background-color: gold;
 }
 .crucero {
-  border: 3px solid green;
   background-color: green;
 }
 .destructor {
-  border: 3px solid red;
   background-color: red;
+}
+
+.positioned {
+  opacity: 0.5;
 }

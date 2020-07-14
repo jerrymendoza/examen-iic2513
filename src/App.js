@@ -10,13 +10,31 @@ class App extends React.Component {
     this.state = {
         battle: new Battle(),
         shipSelected: NaN,
+        positionMouse: {x:NaN, y:NaN}
     };
   }
   handleShipSelection = (ship) => {
-    this.setState({
-      shipSelected: ship,
-    })
+    if (!ship.positioned) {
+      this.setState({
+        shipSelected: ship,
+      })
+    }
 
+  }
+  handleCellClick = (cell) => {
+    const { shipSelected, positionMouse } = this.state 
+    if (shipSelected) {
+      this.state.battle.insertShipOnField(shipSelected, positionMouse)
+      this.setState({
+        shipSelected: NaN,
+      })
+    };
+  };
+
+  handlePositionMouse = (positionMouse) => {
+    this.setState({
+      positionMouse
+    })
   }
   render() {
     const { battle } = this.state
@@ -30,9 +48,11 @@ class App extends React.Component {
     return (
       <div className="App">
         <h1>IIC2513 - EXAMEN </h1>
-        <p>{`${this.state.shipSelected}`}</p>
+        <p>{this.state.shipSelected ? this.state.shipSelected.id : 'No Selected'} </p>
         <Tablero 
           tablero={battle.tablero}
+          handleCellClick={this.handleCellClick}
+          handlePositionMouse={this.handlePositionMouse}
         />
         {naves}
       </div>

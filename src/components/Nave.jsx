@@ -6,7 +6,6 @@ class Nave extends React.Component {
         this.state = {
             over: false,
             selected: false,
-            ship: props.ship,
         };
     }
 
@@ -23,18 +22,20 @@ class Nave extends React.Component {
 
     handleSelect = () => {
         this.setState({selected: this.state.selected ? false : true}, () => {
-            this.props.handleShipSelection(this.state.ship.id)
+            this.props.handleShipSelection(this.props.ship)
         });
     };
 
     render()
         {
+            const { ship } = this.props;
             return (
                 <div
-                className={`nave${this.state.over ? " over" : ""} ${this.state.ship.tipo}`}
+                className={`nave${this.state.over ? " over" : ""} ${ship.tipo} ${ship.positioned ? " positioned" : ""}`}
                 onMouseEnter={this.handleMouseEnter} 
                 onMouseLeave={this.handleMouseLeave}
                 onClick={this.handleSelect}>
+                    {ship.id}
                 </div>
             )
         }

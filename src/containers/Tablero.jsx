@@ -1,5 +1,4 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import Celda from '../components/Celda';
 
 
@@ -12,21 +11,15 @@ class Tablero extends React.Component {
     }
 
     handleMouseEnter = () => {
-        console.log(`Entro! al tablero`)
         this.setState({
             over: true
         })
     };
     handleMouseLeave = () => {
-        console.log(`Salio! al tablero`)
         this.setState({
             over: false
-
         })
     };
-    handleCellClick = (cell) => {
-        console.log(cell.id);
-    }
     render()
         {
 
@@ -35,7 +28,8 @@ class Tablero extends React.Component {
         const mapa = Object.keys(tablero.elements).map((key, index) => <Celda 
                                                     key={key}
                                                     cell={tablero.elements[key]}
-                                                    handleCellClick={this.handleCellClick} 
+                                                    handleCellClick={this.props.handleCellClick}
+                                                    handlePositionMouse={this.props.handlePositionMouse}
                                                     />);
         
         return (
@@ -44,7 +38,6 @@ class Tablero extends React.Component {
             onMouseEnter={this.handleMouseEnter} 
             onMouseLeave={this.handleMouseLeave}>
                 {mapa}
-               
             </div>
         )
         }

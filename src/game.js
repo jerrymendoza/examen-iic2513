@@ -28,12 +28,25 @@ export default class Battle {
         }
     }
 
+    insertShipOnField(ship, position){
+        this.tablero.insert(ship, position)
+    }
+
 }
 
 class Tablero {
     constructor() {
         this.elements = build()
     }   
+
+    insert(ship, position){
+        const id = `${position.x}${position.y}`
+        if (!this.elements[id].content) {
+            this.elements[id].content = ship
+            ship.setPosition(position)
+        }
+        
+    }
 
     getCruz(position){
         const availables = []
@@ -57,6 +70,7 @@ class Tablero {
 
         return availables
     }
+
 }
 
 class Celda {
@@ -64,6 +78,7 @@ class Celda {
         this.x = x;
         this.y = y;
         this.id = `${x}${y}`
+        this.content = NaN
     }
     isActive (){
         return this.active;
@@ -76,11 +91,13 @@ class Nave {
     constructor(id, tipo){
         this.id = id;
         this.tipo = tipo;
-        this.posicion = {x: NaN, y: NaN }
+        this.posicion = {x: NaN, y: NaN}
+        this.positioned = false
     };
 
     setPosition(posicion){
         this.posicion = posicion;
+        this.positioned = true;
     };
 
 
