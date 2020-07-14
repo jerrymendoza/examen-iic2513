@@ -1,11 +1,11 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import Celda from './components/Celda';
+import Tablero from './containers/Tablero';
 function App() {
   return (
     <div className="App">
-      <Celda x='A' y='1'/>
+      <Tablero/>
     </div>
   );
 }
