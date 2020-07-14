@@ -10,11 +10,10 @@ function build() {
     return items;
 };
 
-
 export default class Battle {
     constructor(){
-        this.tablero = new Tablero()
-        this.naves = {'P1': new Nave('P1', 'portaviones')}
+        this.tablero = new Tablero();
+        this.naves = {'P1': new Nave('P1', 'portaviones')};
 
         for (let i = 1; i < 5; i++){
             this.naves[`F${i}`] = new Nave(`F${i}`, 'fragata')
@@ -69,11 +68,6 @@ class Celda {
     isActive (){
         return this.active;
     }
-
-    myId(){
-        console.log(this.id)
-    }
-
 
 
 }; 

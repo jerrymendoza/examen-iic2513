@@ -24,7 +24,9 @@ class Tablero extends React.Component {
 
         })
     };
-
+    handleCellClick = (cell) => {
+        console.log(cell.id);
+    }
     render()
         {
 
@@ -32,7 +34,8 @@ class Tablero extends React.Component {
  
         const mapa = Object.keys(tablero.elements).map((key, index) => <Celda 
                                                     key={key}
-                                                    cell={tablero.elements[key]} 
+                                                    cell={tablero.elements[key]}
+                                                    handleCellClick={this.handleCellClick} 
                                                     />);
         
         return (
@@ -41,15 +44,12 @@ class Tablero extends React.Component {
             onMouseEnter={this.handleMouseEnter} 
             onMouseLeave={this.handleMouseLeave}>
                 {mapa}
+               
             </div>
         )
         }
 }
 
-const mapStateToProps = (state) => {
-    return {
-        tablero: state.tablero
-    };
-};
+
 
 export default Tablero;

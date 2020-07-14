@@ -8,7 +8,7 @@ const mapStateToProps = state => ({
 });
 
 const Game = connect(
-  mapStateToProps,
+  mapStateToProps, {}
 )(App);
 
 export default Game;

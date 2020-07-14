@@ -1,6 +1,5 @@
 import React from 'react';
 
-
 class Nave extends React.Component {
     constructor(props) {
         super(props);
@@ -24,7 +23,7 @@ class Nave extends React.Component {
 
     handleSelect = () => {
         this.setState({selected: this.state.selected ? false : true}, () => {
-            alert(`Nave[${this.state.ship.tipo}] ${this.state.selected}`);
+            this.props.handleShipSelection(this.state.ship.id)
         });
     };
 
@@ -40,6 +39,7 @@ class Nave extends React.Component {
             )
         }
 }
+
 
 
 export default Nave;

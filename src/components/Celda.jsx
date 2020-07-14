@@ -12,7 +12,6 @@ class Celda extends React.Component {
 
     handleMouseEnter = () => {
         const { cell } = this.state;
-        cell.myId()
         this.setState({
             over: true
         })
@@ -22,6 +21,9 @@ class Celda extends React.Component {
             over: false
         })
     };
+    handleCellClick = () => {
+        this.props.handleCellClick(this.state.cell)
+    }
 
     render()
         {
@@ -29,7 +31,9 @@ class Celda extends React.Component {
                 <div
                 className={`celda${this.state.over ? " over" : ""}`}
                 onMouseEnter={this.handleMouseEnter} 
-                onMouseLeave={this.handleMouseLeave}>
+                onMouseLeave={this.handleMouseLeave}
+                onClick={this.handleCellClick}
+                >
                 </div>
             )
         }
