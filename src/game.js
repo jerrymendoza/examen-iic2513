@@ -2,6 +2,7 @@
 /* eslint-disable no-redeclare */
 import { ApiService } from './Api';
 import { element } from 'prop-types';
+import React from 'react';
 const columns = ['A', 'B', 'C', 'D', 'E','F', 'G', 'H', 'I', 'J']
 const CONFIG = {
     'fragata': { 'cantidad': 1, 'movimiento': 4, 'disparo': 2, 'id':'F'},
@@ -29,6 +30,12 @@ async function newGameApi(){
     return data.data.gameId
 }
 
+async function call(data, id){
+    var data = await ApiService().put(`/games/${id}/action`, data)
+    console.log(data)
+    return data
+}
+
 export default class Battle {
     constructor(){
         this.tablero = new Tablero();
@@ -48,21 +55,14 @@ export default class Battle {
             this.naves[`D${i}`] = new Nave(`D${i}`, 'destructor')
         }
     }
-    async call(data){
-        var response = await ApiService().put(`/games/${this.gameId}/action`, data)
-        console.log(response);
-        return response
-    }
+    
     //api
     action(){}
     events(){}
     //interno
     
-    start(){
+    start(gameId){
         this.playing = true;
-        ApiService().post('/games', {}).then( data => {
-            this.gameId = data.data.gameId
-        })
         return true
     };
     surrender(){};
@@ -106,10 +106,7 @@ export default class Battle {
                 column: cell.getColumn()
             }
         }
-
-        const response = this.call(payload)
-        console.log(response.data)
-        return true
+        return payload
     };
     performMove(data){
         // ya debe estar validado
@@ -118,14 +115,7 @@ export default class Battle {
         cell.content = ship
         ship.posicion = cell.getPosition()
         oldCell.removeContent()
-        const payload = {
-            action: {
-                type: "MOVE",
-                ship: ship.id,
-                direction: ,
-                quantity: cell.getColumn()
-            }
-        }
+        
         return true
     };
     

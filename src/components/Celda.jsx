@@ -9,7 +9,7 @@ class Celda extends React.Component {
             over: false,
         };
     }
-
+    
     handleMouseEnter = () => {
         const { cell } = this.state;
         this.props.handlePositionMouse({
@@ -28,13 +28,14 @@ class Celda extends React.Component {
     handleCellClick = () => {
         this.props.handleCellClick(this.state.cell)
     };
+
     render()
         {
             const { cell } = this.props;
             const content = cell.content ? cell.content : '';
             return (
                 <div
-                className={`celda${this.state.over ? " over" : ""}${content ? ` ${content.tipo}` : ""} ${cell.selectable ? " selectable" : ""}`}
+                className={`celda${this.state.over ? " over" : ""}${content ? ` ${content.tipo}` : ""} ${cell.selectable ? " selectable" : ""} ${!cell.active ? " inactive" : ""}`}
                 onMouseEnter={this.handleMouseEnter} 
                 onMouseLeave={this.handleMouseLeave}
                 onClick={this.handleCellClick}

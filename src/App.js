@@ -3,6 +3,7 @@ import './App.css';
 import Tablero from './containers/Tablero';
 import Nave from './components/Nave';
 import Battle from './game';
+import { ApiService } from './Api';
 
 
 class GameApp extends React.Component {
@@ -12,7 +13,8 @@ class GameApp extends React.Component {
         battle: new Battle(),
         shipSelected: NaN,
         positionMouse: {x:NaN, y:NaN},
-        inAction: NaN
+        inAction: NaN,
+        waiting: false,
     };
     this.handleCellClick = this.handleCellClick.bind(this);
     //console.log(this.state.battle.tablero.getCruz({x:'F', y: 1}, 2))
@@ -51,10 +53,28 @@ class GameApp extends React.Component {
           shipSelected: NaN,
         })
     } else if (shipSelected && battle.playing && inAction){
-      const response = battle.accion({action: inAction, ship:shipSelected, cell: cell})
+      const payload = battle.accion({action: inAction, ship:shipSelected, cell: cell})
       
-      if (response) {
+      if (payload) {
+        switch (inAction){
+          case 'FIRE':
+            this.setState({
+              waiting: true
+            })
+            ApiService().post(`/games/${this.state.gameId}/action`, payload).then(response => {
+              console.log(response.data)
+              this.setState({waiting:false})
+            }
+           ).catch(error => console.log(error))
+            break
+          case 'MOVE':
+            break
+          default:
+            console.log('Nada por aca...')
+        }
         console.log(`[Usuario] ${inAction} - ${shipSelected.id} -> ${cell.id}`)
+
+
         this.setState({})
         this.cancelButton()
       }
@@ -77,9 +97,17 @@ class GameApp extends React.Component {
   }
 
   start = () => {
-    if (this.state.battle.start()) {
-      this.setState({},console.log(this.state.battle))
-    }
+    this.setState({
+      waiting: true
+    })
+    ApiService().post('/games', {}).then( data => {
+      console.log(data.data);
+      this.state.battle.start()
+      this.setState({
+        waiting:false,
+        gameId: data.data.gameId
+      })
+    }).catch(error => alert(error))
   }
 
   moveButton = () => {
@@ -96,7 +124,7 @@ class GameApp extends React.Component {
     this.setState({inAction: NaN,  shipSelected: NaN})
   }
   surrenderButton = () => {
-    
+
   }
   render() {
     const { battle} = this.state
@@ -110,10 +138,10 @@ class GameApp extends React.Component {
     return (
       <div id="game">
         <div id="info">
-        <h1>IIC2513 - EXAMEN </h1>
-        <p>selected: {this.state.shipSelected ? this.state.shipSelected.id : 'No Selected'} </p>
-        <p>accion: {this.state.inAction}</p>
-      
+          <h1>IIC2513 - EXAMEN </h1>
+          <p>selected: {this.state.shipSelected ? this.state.shipSelected.id : 'No Selected'} </p>
+          <p>accion: {this.state.inAction}</p>
+          <p>esperando: {`${this.state.waiting}`}</p>
         </div>
         <div id="center">
         <Tablero 
