@@ -1,9 +1,12 @@
 import axios from 'axios'
 
-export const ApiService = async () => {
+async function auth() {
+    const data = await axios.put('https://battleship.iic2513.phobos.cl/auth', { email: 'jamendoza@uc.cl', studentNumber:'1663392J' });
+    localStorage.setItem('token', data.data.token);
+}
+export const ApiService = () => {
     if (localStorage.getItem("token") === null){
-        const data = await axios.put('https://battleship.iic2513.phobos.cl/auth', { email: 'jamendoza@uc.cl', studentNumber:'1663392J' });
-        localStorage.setItem('token', data.data.token);
+        auth()
     }
     return axios.create({
         baseURL: 'https://battleship.iic2513.phobos.cl',
