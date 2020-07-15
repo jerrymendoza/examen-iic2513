@@ -4,9 +4,9 @@ import { ApiService } from './Api';
 import { element } from 'prop-types';
 const columns = ['A', 'B', 'C', 'D', 'E','F', 'G', 'H', 'I', 'J']
 const CONFIG = {
-    'fragata': { 'cantidad': 4, 'movimiento': 4, 'disparo': 2, 'id':'F'},
-    'crucero': { 'cantidad': 3, 'movimiento': 3, 'disparo': 2, 'id':'C'},
-    'destructor': { 'cantidad': 2, 'movimiento': 2, 'disparo': 3, 'id':'D'},
+    'fragata': { 'cantidad': 1, 'movimiento': 4, 'disparo': 2, 'id':'F'},
+    'crucero': { 'cantidad': 1, 'movimiento': 3, 'disparo': 2, 'id':'C'},
+    'destructor': { 'cantidad': 1, 'movimiento': 2, 'disparo': 3, 'id':'D'},
     'portaviones': { 'cantidad': 1, 'movimiento': 1, 'disparo': 5, 'id':'P'}
 }
 function build() {
@@ -36,20 +36,20 @@ export default class Battle {
         this.playing = false;
         this.gameId = NaN;
         this.naves = {'P1': new Nave('P1', 'portaviones')};
-        for (let i = 1; i < 5; i++){
+        for (let i = 1; i < CONFIG['fragata']['cantidad']+1; i++){
             this.naves[`F${i}`] = new Nave(`F${i}`, 'fragata')
         }
 
-        for (let i = 1; i < 4; i++){
+        for (let i = 1; i < CONFIG['crucero']['cantidad']+1; i++){
             this.naves[`C${i}`] = new Nave(`C${i}`, 'crucero')
         }
 
-        for (let i = 1; i < 3; i++){
+        for (let i = 1; i < CONFIG['destructor']['cantidad']+1; i++){
             this.naves[`D${i}`] = new Nave(`D${i}`, 'destructor')
         }
     }
-    call = (data) =>{
-        var response = ApiService().post(`/games/${this.gameId}/action`, data)
+    async call(data){
+        var response = await ApiService().put(`/games/${this.gameId}/action`, data)
         console.log(response);
         return response
     }
@@ -73,10 +73,10 @@ export default class Battle {
         if (valid){
             this.cancelTarget();
             switch (data.action){
-                case 'fire':
+                case 'FIRE':
                     return this.performFire(data);
                     
-                case 'move':
+                case 'MOVE':
                     return this.performMove(data);
                     
                 default:
@@ -98,7 +98,18 @@ export default class Battle {
     performFire(data){
         // ya debe estar validado
         const {ship, cell} = data;
-        
+        const payload = {
+            action: {
+                type: "FIRE",
+                ship: ship.id,
+                row: cell.getRow(),
+                column: cell.getColumn()
+            }
+        }
+
+        const response = this.call(payload)
+        console.log(response.data)
+        return true
     };
     performMove(data){
         // ya debe estar validado
@@ -107,6 +118,14 @@ export default class Battle {
         cell.content = ship
         ship.posicion = cell.getPosition()
         oldCell.removeContent()
+        const payload = {
+            action: {
+                type: "MOVE",
+                ship: ship.id,
+                direction: ,
+                quantity: cell.getColumn()
+            }
+        }
         return true
     };
     
@@ -138,10 +157,10 @@ export default class Battle {
     activateRange(cell, action){
         // marcar rango
         switch (action){
-            case 'fire':
+            case 'FIRE':
                 this.tablero.rangeFire(cell, action)
                 break
-            case 'move':
+            case 'MOVE':
                 this.tablero.rangeMove(cell, action)
                 break
             default:
@@ -203,7 +222,7 @@ class Tablero {
         north.map(y => {
             availables.push({x: position.x, y: y})
         })
-        return availables
+        return [availables, 'NORTH']
     }
 
     getSouth(position, range){
@@ -216,7 +235,7 @@ class Tablero {
         sur.map(y => {
             availables.push({x: position.x, y: y})
         })
-        return availables;
+        return [availables, 'SOUTH'];
     }
     getEast(position, range){
         var availables = [];
@@ -224,7 +243,7 @@ class Tablero {
         este.map(x => {
             availables.push({x: x, y: position.y})
         })
-        return availables
+        return [availables, 'EAST'];
     }
     getWest(position, range){
         var availables = [];
@@ -233,14 +252,14 @@ class Tablero {
         oeste.map(x => {
             availables.push({x: x, y: position.y})
         })
-        return availables
+        return [availables,'WEST']
     }
     getCruz(position, range){
         const availables = [
-            ...this.getNorth(position,range),
-            ...this.getSouth(position,range),
-            ...this.getEast(position,range),
-            ...this.getWest(position,range),
+            ...this.getNorth(position,range)[0],
+            ...this.getSouth(position,range)[0],
+            ...this.getEast(position,range)[0],
+            ...this.getWest(position,range)[0],
         ]
         return availables
     }
@@ -269,9 +288,9 @@ class Tablero {
 
     getCellCruz(ship, tipo){
         switch (tipo) {
-            case 'fire':
+            case 'FIRE':
                 return this.checkCells(this.getCruz(ship.posicion, ship.disparo))
-            case 'move':
+            case 'MOVE':
                 return this.checkCells(this.getCruz(ship.posicion, ship.movimiento))
             default:
                 return false
@@ -308,6 +327,12 @@ class Celda {
     getPosition(){
         return {x: this.x, y:this.y}
     }
+    getRow(){
+        return this.y-1
+    }
+    getColumn(){
+        return columns.indexOf(this.x)
+    }
 }; 
 
 class Nave {
@@ -327,9 +352,9 @@ class Nave {
     };
 
     myRange(tipo){
-        if (tipo==='fire'){
+        if (tipo==='FIRE'){
             return this.disparo
-        } else if (tipo==='move'){
+        } else if (tipo==='MOVE'){
             return this.movimiento
         }
     }
