@@ -34,7 +34,7 @@ class Celda extends React.Component {
             const content = cell.content ? cell.content : '';
             return (
                 <div
-                className={`celda${this.state.over ? " over" : ""}${content ? ` ${content.tipo}` : ""}`}
+                className={`celda${this.state.over ? " over" : ""}${content ? ` ${content.tipo}` : ""} ${cell.selectable ? " selectable" : ""}`}
                 onMouseEnter={this.handleMouseEnter} 
                 onMouseLeave={this.handleMouseLeave}
                 onClick={this.handleCellClick}

@@ -20,7 +20,7 @@
   grid-template-rows: repeat(10, 1fr);
   grid-auto-flow: column;
   grid-area: mapa;
-  gap:2px;
+
 }
 
 .axis {
@@ -45,17 +45,18 @@
   width: 50px;
   height: 50px;
   background-color: skyblue;
+  border: solid 2px white;
 }
 
 .celda.over {
-  background-color: brown;
+
 }
 
 .nave {
   width: 40px;
   height: 40px;
-  border: 2px solid blue;
-  margin: 2px;
+  margin: 3px;
+  padding: 5px;
 }
 
 .portaviones {
@@ -74,4 +75,21 @@
 
 .positioned {
   opacity: 0.5;
+}
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.hide {
+  display:none
+}
+.show {
+  display: block;
+}
+
+.selectable {
+  border: 2px solid green;
+  cursor: pointer;
 }
