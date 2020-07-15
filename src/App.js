@@ -2,7 +2,8 @@ import React from 'react';
 import './App.css';
 import Tablero from './containers/Tablero';
 import Nave from './components/Nave';
-import Battle from './game'; 
+import Battle from './game';
+import { ApiService } from './Api';
 
 class GameApp extends React.Component {
   constructor(props) {
@@ -14,6 +15,7 @@ class GameApp extends React.Component {
         inAction: NaN
     };
     //console.log(this.state.battle.tablero.getCruz({x:'F', y: 1}, 2))
+    ApiService()
   }
   handleShipSelection = (ship) => {
     if (!ship.positioned) {
@@ -27,27 +29,21 @@ class GameApp extends React.Component {
     const { shipSelected, positionMouse, battle } = this.state
     if (battle.playing && cell.content) {
       switch (this.state.inAction) {
-        case 'move':
-          // activar rango
-          console.log('rango movimiento')
-          // anular target actual
-          
+        case 'move':          
           this.state.battle.activateRange(cell, 'move')
           this.setState({shipSelected: cell.content })
           break
           
         case 'fire':
-          // activar rango 
-          console.log('rango ataque')
           this.state.battle.activateRange(cell, 'fire')
-          this.setState({})
+          this.setState({shipSelected: cell.content })
           break
 
         default:
           console.log('Sin nada')
       }
     } else {
-      if (shipSelected) {
+      if (shipSelected && !this.state.battle.playing) {
         this.state.battle.insertShipOnField(shipSelected, positionMouse)
         this.setState({
           shipSelected: NaN,
@@ -78,19 +74,20 @@ class GameApp extends React.Component {
     }
   }
 
-  move = () => {
+  moveButton = () => {
     this.state.battle.makeSelectable()
     this.setState({inAction: 'move'})
   }
-  fire = () => {
-    this.state.battle.tablero.selectable()
+  fireButton = () => {
+    this.state.battle.makeSelectable()
     this.setState({inAction: 'fire'})
   }
-  cancel = () => {
+
+  cancelButton = () => {
     this.state.battle.cancelTarget()
-    this.setState({inAction: NaN})
+    this.setState({inAction: NaN,  shipSelected: NaN})
   }
-  surrender = () => {
+  surrenderButton = () => {
 
   }
   render() {
@@ -129,10 +126,10 @@ class GameApp extends React.Component {
 
           <div className={`actions${battle.playing ? " show" : " hide"}`}>
             Actions:
-            <button onClick={this.move}>move</button>
-            <button onClick={this.fire}>fire</button>
-            <button onClick={this.cancel}>cancel</button>
-            <button onClick={this.surrender}>surrender</button>
+            <button onClick={this.moveButton}>move</button>
+            <button onClick={this.fireButton}>fire</button>
+            <button onClick={this.cancelButton}>cancel</button>
+            <button onClick={this.surrenderButton}>surrender</button>
           </div>
 
         </div>

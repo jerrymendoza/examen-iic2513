@@ -45,7 +45,11 @@ export default class Battle {
     start(){
         this.playing = true;
         return true
-    }
+    };
+
+    surrender(){};
+    performFire(){};
+    performMove(){};
     
     insertShipOnField(ship, position){
         this.tablero.insert(ship, position)
@@ -65,13 +69,16 @@ export default class Battle {
     }
 
     makeSelectable(){
-        this.tablero.selectable()
+        // marcar naves
+        this.cancelTarget();
+        this.tablero.selectable();
     }
     cancelTarget(){
-        this.tablero.cancelTarget()
+        this.tablero.cancelTarget();
     }
 
     activateRange(cell, action){
+        // marcar rango
         switch (action){
             case 'fire':
                 this.tablero.rangeFire(cell, action)
@@ -95,30 +102,39 @@ class Tablero {
 
     insert(ship, position){
         const id = `${position.x}${position.y}`
-        if (!this.elements[id].content) {
-            this.elements[id].content = ship
-            ship.setPosition(position)
+        if (!this.existe(ship)) {
+            if (!this.elements[id].content) {
+                this.elements[id].content = ship
+                ship.setPosition(position)
+            }
         }
     }
     
     selectable(){
         for (const [key, value] of Object.entries(this.elements)) {
             if (value.content) {
-                value.selectable = true
+  
+                value.toggleSelectable(true);
             }
         };
     }
     showTarget(celdas){
-        console.log(celdas)
-        celdas.forEach( celda => {
-            const position = {x: celda.x, y: celda.y}
-            this.elements[positionToId(position)].selectable = true
+        celdas.forEach( posicion => {
+            this.elements[positionToId(posicion)].toggleSelectable(true)
         });
     }
     cancelTarget(){
         for (const [key, value] of Object.entries(this.elements)) {
-            value.selectable = false
+            value.toggleSelectable(false);
         }
+    }
+    existe(ship){
+        for (const [key, value] of Object.entries(this.elements)) {
+            if (value.content === ship) {
+                return true
+            }
+        };
+        return false;
     }
     getCruz(position, range){
         const availables = []
@@ -143,9 +159,20 @@ class Tablero {
         norte.concat(sur).map(y => {
             availables.push({x: position.x, y: y})
         })
+        
         return availables
     }
 
+    checkActiveCell(targets){
+        var filtered = []
+        targets.forEach( posicion => {
+            var id = positionToId(posicion)
+            if (this.elements[id].active){
+                filtered.push(posicion)
+            }
+        });
+        return filtered;
+    }
     rangeFire(cell){
         const target = this.getCruz(cell.content.posicion, cell.content.disparo)
         this.cancelTarget()
@@ -171,17 +198,22 @@ class Celda {
     isActive (){
         return this.active;
     }
-
+    toggleSelectable(bol){
+        if (this.active){
+            this.selectable = bol;
+        }
+    }
 }; 
 
 class Nave {
     constructor(id, tipo){
         this.id = id;
         this.tipo = tipo;
-        this.posicion = {x: NaN, y: NaN}
-        this.positioned = false
-        this.disparo = CONFIG[tipo]['disparo']
-        this.movimiento = CONFIG[tipo]['movimiento']
+        this.posicion = {x: NaN, y: NaN};
+        this.positioned = false;
+        this.disparo = CONFIG[tipo]['disparo'];
+        this.movimiento = CONFIG[tipo]['movimiento'];
+        this.alive = true;
     };
 
     setPosition(posicion){
