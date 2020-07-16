@@ -1,13 +1,10 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable no-redeclare */
-import { ApiService } from './Api';
-import { element } from 'prop-types';
-import React from 'react';
 const columns = ['A', 'B', 'C', 'D', 'E','F', 'G', 'H', 'I', 'J']
 const CONFIG = {
-    'fragata': { 'cantidad': 1, 'movimiento': 4, 'disparo': 2, 'id':'F'},
-    'crucero': { 'cantidad': 1, 'movimiento': 3, 'disparo': 2, 'id':'C'},
-    'destructor': { 'cantidad': 1, 'movimiento': 2, 'disparo': 3, 'id':'D'},
+    'fragata': { 'cantidad': 4, 'movimiento': 4, 'disparo': 2, 'id':'F'},
+    'crucero': { 'cantidad': 3, 'movimiento': 3, 'disparo': 2, 'id':'C'},
+    'destructor': { 'cantidad': 2, 'movimiento': 2, 'disparo': 3, 'id':'D'},
     'portaviones': { 'cantidad': 1, 'movimiento': 1, 'disparo': 5, 'id':'P'}
 }
 function build() {
@@ -25,16 +22,6 @@ function positionToId(position){
     return `${position.x}${position.y}`
 }
 
-async function newGameApi(){
-    var data = await ApiService().post('/games', {})
-    return data.data.gameId
-}
-
-async function call(data, id){
-    var data = await ApiService().put(`/games/${id}/action`, data)
-    console.log(data)
-    return data
-}
 
 export default class Battle {
     constructor(){
@@ -56,20 +43,36 @@ export default class Battle {
         }
     }
     
-    //api
-    action(){}
-    events(){}
+   
     //interno
     
     start(gameId){
         this.playing = true;
         return true
     };
+    checkShips(){
+        for (const [, value] of Object.entries(this.naves)) {
+            if (value.alive) {
+                return true
+            }
+        }
+        return false
+    }
+    receiveFire(id){
+        // id de celda
+        const cell = this.tablero.getCellById(id)
+        if (cell.content) {
+            cell.content.alive = false;
+            cell.active = false;
+            return cell
+        }
+        return false
+    }
+
     surrender(){};
 
     accion(data){
         const valid = this.isActionValid(data);
-        console.log(valid)
         if (valid){
             this.cancelTarget();
             switch (data.action){
@@ -112,11 +115,18 @@ export default class Battle {
         // ya debe estar validado
         const {ship, cell} = data;
         const oldCell = this.tablero.getCell(ship.posicion)
+        const direction = this.tablero.getMoveDirection(oldCell, cell)
         cell.content = ship
         ship.posicion = cell.getPosition()
         oldCell.removeContent()
-        
-        return true
+        const payload = {
+            action: {
+                type: "MOVE",
+                ship: ship.id,
+                ...direction
+            }
+        }
+        return payload
     };
     
     insertShipOnField(ship, position){
@@ -127,7 +137,7 @@ export default class Battle {
     }
     
     isReady(){
-        for (const [key, value] of Object.entries(this.naves)) {
+        for (const [, value] of Object.entries(this.naves)) {
             if (!value.positioned) {
                 return false
             }
@@ -159,6 +169,10 @@ export default class Battle {
         
     }
 
+    showEnemies(){
+
+    }
+
 }
 
 class Tablero {
@@ -175,9 +189,8 @@ class Tablero {
             }
         }
     }
-    
     selectable(){
-        for (const [key, value] of Object.entries(this.elements)) {
+        for (const [, value] of Object.entries(this.elements)) {
             if (value.content) {
   
                 value.toggleSelectable(true);
@@ -189,13 +202,25 @@ class Tablero {
             this.elements[cell.id].toggleSelectable(true)
         });
     }
+
+    showEnemies(celdas){
+        celdas.forEach( cell => {
+            this.elements[cell.id].toggleLighting(true)
+        });
+    }
+    hideEnemies(){
+        for (const [, value] of Object.entries(this.elements)) {
+            value.lighting = false;
+        }
+    }
+
     cancelTarget(){
-        for (const [key, value] of Object.entries(this.elements)) {
+        for (const [, value] of Object.entries(this.elements)) {
             value.toggleSelectable(false);
         }
     }
     existe(ship){
-        for (const [key, value] of Object.entries(this.elements)) {
+        for (const [, value] of Object.entries(this.elements)) {
             if (value.content === ship) {
                 return true
             }
@@ -212,7 +237,7 @@ class Tablero {
         north.map(y => {
             availables.push({x: position.x, y: y})
         })
-        return [availables, 'NORTH']
+        return [availables, 'NORTH', availables.map(x => positionToId(x))]
     }
 
     getSouth(position, range){
@@ -225,7 +250,7 @@ class Tablero {
         sur.map(y => {
             availables.push({x: position.x, y: y})
         })
-        return [availables, 'SOUTH'];
+        return [availables, 'SOUTH', availables.map(x => positionToId(x))];
     }
     getEast(position, range){
         var availables = [];
@@ -233,7 +258,7 @@ class Tablero {
         este.map(x => {
             availables.push({x: x, y: position.y})
         })
-        return [availables, 'EAST'];
+        return [availables, 'EAST', availables.map(x => positionToId(x))];
     }
     getWest(position, range){
         var availables = [];
@@ -242,7 +267,7 @@ class Tablero {
         oeste.map(x => {
             availables.push({x: x, y: position.y})
         })
-        return [availables,'WEST']
+        return [availables,'WEST', availables.map(x => positionToId(x))]
     }
     getCruz(position, range){
         const availables = [
@@ -254,18 +279,23 @@ class Tablero {
         return availables
     }
 
-    checkCells(targets){
+    checkCells(targets, tipo = NaN, ship= NaN){
         var filtered = []
         targets.forEach( posicion => {
             var id = positionToId(posicion)
-            if (this.elements[id].active && !this.elements[id].content){
+            //if (this.elements[id].active && !this.elements[id].content){
+            if (this.elements[id].active){
                 filtered.push(this.elements[id])
             }
         });
+        if (tipo === 'FIRE' && ship){
+            var id = positionToId(ship.posicion)
+            filtered.push(this.elements[id])
+        }
         return filtered;
     }
     rangeFire(cell){
-        const target = this.checkCells(this.getCruz(cell.content.posicion, cell.content.disparo));
+        const target = this.checkCells(this.getCruz(cell.content.posicion, cell.content.disparo), 'FIRE', cell.content);
         this.cancelTarget()
         this.showTarget(target)
         return true
@@ -279,7 +309,7 @@ class Tablero {
     getCellCruz(ship, tipo){
         switch (tipo) {
             case 'FIRE':
-                return this.checkCells(this.getCruz(ship.posicion, ship.disparo))
+                return this.checkCells(this.getCruz(ship.posicion, ship.disparo),'FIRE', ship)
             case 'MOVE':
                 return this.checkCells(this.getCruz(ship.posicion, ship.movimiento))
             default:
@@ -291,6 +321,36 @@ class Tablero {
         var id = positionToId(posicion)
         return this.elements[id]
     }
+    getCellById(id){
+        return this.elements[id]
+    }
+
+
+    getMoveDirection(oldCell, cell){
+        const destiny = cell.id
+        const origin = {x: oldCell.x, y:oldCell.y}
+
+        var north  = this.getNorth(origin, 10)
+        if( north[2].includes(destiny)){
+            return {direction: north[1], quantity: north[2].indexOf(destiny)+1 }
+        }
+        var south  = this.getSouth(origin, 10)
+
+        if( south[2].includes(destiny)){
+            return {direction: south[1], quantity: south[2].indexOf(destiny)+1 }
+        }
+        var east  = this.getEast(origin, 10)
+
+        if( east[2].includes(destiny)){
+            return {direction: east[1], quantity: east[2].indexOf(destiny)+1 }
+        }
+        var west  = this.getWest(origin, 10)
+
+        if( west[2].includes(destiny)){
+            return {direction: west[1], quantity: west[2].indexOf(destiny)+1 }
+        }
+        return false
+    }
 }
 
 class Celda {
@@ -301,6 +361,7 @@ class Celda {
         this.content = NaN;
         this.active = true;
         this.selectable = false;
+        this.lighting = false;
     }
     isActive (){
         return this.active;
@@ -309,6 +370,10 @@ class Celda {
         if (this.active){
             this.selectable = bol;
         }
+    }
+
+    toggleLighting(bol){
+        this.lighting = bol;
     }
 
     removeContent(){

@@ -31,7 +31,7 @@ class Nave extends React.Component {
             const { ship } = this.props;
             return (
                 <div
-                className={`nave${this.state.over ? " over" : ""} ${ship.tipo} ${ship.positioned ? " positioned" : ""}`}
+                className={`nave${this.state.over ? " over" : ""} ${ship.tipo} ${ship.positioned ? " positioned" : ""}${ship.alive ? " alive" : " dead"}`}
                 onMouseEnter={this.handleMouseEnter} 
                 onMouseLeave={this.handleMouseLeave}
                 onClick={this.handleSelect}>

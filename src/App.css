@@ -57,6 +57,7 @@
   height: 40px;
   margin: 3px;
   padding: 5px;
+  display: inline-block;
 }
 
 .portaviones {
@@ -96,4 +97,85 @@
 
 .inactive {
   opacity:0.3;
+}
+
+.alive {
+  border: solid 2px blue;
+}
+.dead {
+  border: solid 2px red;
+  opacity: 0.1;
+}
+#bitacora {
+  height:320px;
+  width:300px;
+  border:1px solid #ccc;
+  overflow:auto;
+}
+#bitacora ul {
+  list-style: square inside;
+}
+.light {
+  animation: light 1s 2;
+}
+
+@keyframes light {
+  0% {
+    border: 2px solid white;
+  }
+  50% {
+    border: 2px solid greenyellow;
+  }
+  100% {
+    border: 2px solid white;
+  }
+}
+
+
+#sidebar {
+  width: 350px;
+  margin-left:20px;
+  margin-top:25px
+}
+
+.cargando {
+  position: absolute;
+  top:50%;
+  left:50%;
+  margin: 0 auto;
+  display:inline-block;
+  font-weight: bold;
+}
+
+.win {
+  position: absolute;
+  top:50%;
+  left:50%;
+  margin: 0 auto;
+  display:inline-block;
+  font-weight: bold;
+}
+.lose {
+  position: absolute;
+  top:50%;
+  left:50%;
+  margin: 0 auto;
+  display:inline-block;
+  font-weight: bold;
+}
+.surrender {
+  position: absolute;
+  top:50%;
+  left:50%;
+  margin: 0 auto;
+  display:inline-block;
+  font-weight: bold;
+}
+button {
+  padding:5px;
+}
+
+
+.win {
+  
 }

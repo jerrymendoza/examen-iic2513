@@ -35,7 +35,7 @@ class Tablero extends React.Component {
         return (
 
             <div id="tablero" 
-            className={`tablero${this.state.over ? " over" : ""}`}
+            className={`tablero`}
             onMouseEnter={this.handleMouseEnter} 
             onMouseLeave={this.handleMouseLeave}>
                 <div className="x-axis axis">
@@ -64,6 +64,7 @@ class Tablero extends React.Component {
                 </div>
                 <div className="mapa">{mapa}</div>
             </div>
+            
         )
         }
 }
